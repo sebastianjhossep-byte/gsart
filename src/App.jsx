@@ -85,12 +85,12 @@ const GlobalStyles = () => (
 
 const Btn = ({ children, variant = "purple", size = "md", onClick, style = {}, disabled }) => {
   const v = {
-    purple:  { background: "linear-gradient(135deg, #6b2fa0, #9b4fcc)", color: "#f0ecf8", border: "none" },
+    purple: { background: "linear-gradient(135deg, #6b2fa0, #9b4fcc)", color: "#f0ecf8", border: "none" },
     outline: { background: "transparent", color: "var(--purple2)", border: "1px solid var(--purple)" },
-    ghost:   { background: "transparent", color: "var(--text2)", border: "1px solid var(--border)" },
-    dark:    { background: "var(--dark2)", color: "var(--text)", border: "1px solid var(--border2)" },
-    danger:  { background: "transparent", color: "var(--red)", border: "1px solid rgba(192,57,43,0.4)" },
-    green:   { background: "transparent", color: "var(--green)", border: "1px solid rgba(39,174,96,0.4)" },
+    ghost: { background: "transparent", color: "var(--text2)", border: "1px solid var(--border)" },
+    dark: { background: "var(--dark2)", color: "var(--text)", border: "1px solid var(--border2)" },
+    danger: { background: "transparent", color: "var(--red)", border: "1px solid rgba(192,57,43,0.4)" },
+    green: { background: "transparent", color: "var(--green)", border: "1px solid rgba(39,174,96,0.4)" },
   };
   const s = {
     sm: { padding: "6px 14px", fontSize: 10, letterSpacing: "0.12em" },
@@ -174,7 +174,7 @@ const Navbar = ({ user, cartCount, onCart, onAuth, onLogout, onAdmin, onBoutique
         </div>
       </div>
       <div style={{ display: "flex", gap: 40, alignItems: "center" }}>
-        {[["Colección","collection"],["Artistas","artists"],["Boutique","boutique"]].map(([label, pg]) => (
+        {[["Colección", "collection"], ["Artistas", "artists"], ["Boutique", "boutique"]].map(([label, pg]) => (
           <button key={pg} onClick={() => pg === "boutique" ? onBoutique() : setPage(pg)} style={{
             background: "none", border: "none", fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase",
             color: currentPage === pg ? "var(--purple2)" : "var(--text2)", cursor: "pointer", transition: "color 0.3s", padding: 0,
@@ -207,7 +207,7 @@ const Navbar = ({ user, cartCount, onCart, onAuth, onLogout, onAdmin, onBoutique
   );
 };
 
-const Hero = ({ setPage, onBoutique}) => (
+const Hero = ({ setPage, onBoutique }) => (
   <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden", textAlign: "center", padding: "0 40px" }}>
     <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 60%, #1a0a2e 0%, #060608 70%)" }} />
     <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(155,79,204,0.03) 60px, rgba(155,79,204,0.03) 61px), repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(155,79,204,0.03) 60px, rgba(155,79,204,0.03) 61px)" }} />
@@ -345,7 +345,7 @@ const BoutiqueModal = ({ onClose, onAccess, products }) => {
               <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic", color: "var(--text2)", fontSize: 15, marginTop: 12 }}>Obras únicas disponibles exclusivamente para usted</p>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 40 }}>
-              {boutiqueProducts.map(p => <ProductCard key={p.id} product={p} onAddToCart={(prod) => { onAccess(prod); onClose(); }} onClick={() => {}} />)}
+              {boutiqueProducts.map(p => <ProductCard key={p.id} product={p} onAddToCart={(prod) => { onAccess(prod); onClose(); }} onClick={() => { }} />)}
             </div>
           </div>
         )}
@@ -451,7 +451,7 @@ const CheckoutModal = ({ cart, user, onClose, onSuccess }) => {
             <div style={{ fontSize: 9, letterSpacing: "0.4em", textTransform: "uppercase", color: "var(--purple)", marginBottom: 24 }}>Paso 2 de 2</div>
             <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 32, fontWeight: 300, marginBottom: 36 }}>Método de pago</h3>
             <div style={{ display: "flex", gap: 16, marginBottom: 36 }}>
-              {[["stripe","💳 Tarjeta"],["paypal","🅿 PayPal"]].map(([id, label]) => (
+              {[["stripe", "💳 Tarjeta"], ["paypal", "🅿 PayPal"]].map(([id, label]) => (
                 <button key={id} onClick={() => setPayMethod(id)} style={{
                   flex: 1, padding: "16px", background: "transparent", cursor: "pointer",
                   border: `1px solid ${payMethod === id ? "var(--purple)" : "var(--border)"}`,
@@ -533,7 +533,7 @@ const AuthModal = ({ onClose, onAuth }) => {
           </div>
         </div>
         <div style={{ display: "flex", marginBottom: 36, borderBottom: "1px solid var(--border)" }}>
-          {[["login","Acceder"],["register","Registrarse"]].map(([m, l]) => (
+          {[["login", "Acceder"], ["register", "Registrarse"]].map(([m, l]) => (
             <button key={m} onClick={() => { setMode(m); setError(""); setSuccess(""); }} style={{
               flex: 1, padding: "12px", background: "none", border: "none", fontSize: 9,
               letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer",
@@ -607,7 +607,7 @@ const AdminPanel = ({ onClose }) => {
           <button onClick={onClose} style={{ background: "none", border: "1px solid var(--border)", color: "var(--text2)", padding: "8px 20px", cursor: "pointer", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase" }}>Cerrar</button>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, marginBottom: 48 }}>
-          {[["Productos", products.length],["Pedidos", orders.length],["Códigos", codes.length],["Ingresos", `${orders.reduce((s, o) => s + (o.total || 0), 0).toLocaleString("es-ES")} €`]].map(([label, value]) => (
+          {[["Productos", products.length], ["Pedidos", orders.length], ["Códigos", codes.length], ["Ingresos", `${orders.reduce((s, o) => s + (o.total || 0), 0).toLocaleString("es-ES")} €`]].map(([label, value]) => (
             <div key={label} style={{ padding: "24px", background: "var(--dark)", border: "1px solid var(--border)" }}>
               <div style={{ fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text2)", marginBottom: 8 }}>{label}</div>
               <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 32, color: "var(--purple2)" }}>{value}</div>
@@ -615,7 +615,7 @@ const AdminPanel = ({ onClose }) => {
           ))}
         </div>
         <div style={{ display: "flex", borderBottom: "1px solid var(--border)", marginBottom: 40 }}>
-          {[["products","Productos"],["orders","Pedidos"],["codes","Códigos Boutique"]].map(([t, l]) => (
+          {[["products", "Productos"], ["orders", "Pedidos"], ["codes", "Códigos Boutique"]].map(([t, l]) => (
             <button key={t} onClick={() => setTab(t)} style={{ padding: "12px 24px", background: "none", border: "none", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer", color: tab === t ? "var(--purple2)" : "var(--text2)", borderBottom: tab === t ? "1px solid var(--purple)" : "none", marginBottom: -1, transition: "color 0.3s" }}>{l}</button>
           ))}
         </div>
@@ -675,7 +675,17 @@ const AdminPanel = ({ onClose }) => {
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 24, color: "var(--purple2)", marginBottom: 4 }}>{order.total?.toLocaleString("es-ES")} €</div>
-                    <div style={{ fontSize: 9, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.1em" }}>{order.status}</div>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                      <div style={{ fontSize: 9, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.1em" }}>{order.status}</div>
+                      {order.status !== "cancelled" && (
+                        <button onClick={async () => {
+                          await supabase.from("orders").update({ status: "cancelled" }).eq("id", order.id);
+                          setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status: "cancelled" } : o));
+                        }} style={{ background: "none", border: "1px solid rgba(192,57,43,0.4)", color: "var(--red)", fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", padding: "3px 8px", cursor: "pointer" }}>
+                          Cancelar
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -726,7 +736,7 @@ const Footer = ({ setPage }) => (
     </div>
     <div>
       <div style={{ fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--purple)", marginBottom: 20 }}>Galería</div>
-      {[["Colección","collection"],["Artistas","artists"]].map(([l, p]) => (
+      {[["Colección", "collection"], ["Artistas", "artists"]].map(([l, p]) => (
         <div key={p} style={{ marginBottom: 12 }}>
           <button onClick={() => setPage(p)} style={{ background: "none", border: "none", fontSize: 11, color: "var(--text2)", cursor: "pointer" }}
             onMouseEnter={e => e.currentTarget.style.color = "var(--purple2)"}
