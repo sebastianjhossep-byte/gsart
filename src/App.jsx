@@ -721,7 +721,7 @@ const Footer = ({ setPage }) => (
         <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 28, fontWeight: 300, color: "var(--purple2)" }}>GSART</span>
       </div>
       <p style={{ fontSize: 12, color: "var(--text2)", lineHeight: 1.8, maxWidth: 280, fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic" }}>
-        Simplemente ARTE. Cuadros únicos de artistas emergentes para coleccionistas exigentes.
+        Simplemente Estilo Arte. Cuadros únicos de artistas emergentes para coleccionistas exigentes.
       </p>
     </div>
     <div>
