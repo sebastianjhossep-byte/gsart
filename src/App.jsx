@@ -160,20 +160,20 @@ const Navbar = ({ user, cartCount, onCart, onAuth, onLogout, onAdmin, onBoutique
   return (
     <nav style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-      padding: scrolled ? "14px 48px" : "24px 48px",
+      padding: scrolled ? "14px 20px" : "24px 20px",
       background: scrolled ? "rgba(6,6,8,0.96)" : "transparent",
       borderBottom: scrolled ? "1px solid var(--border)" : "none",
       display: "flex", alignItems: "center", justifyContent: "space-between",
       transition: "all 0.4s ease", backdropFilter: scrolled ? "blur(20px)" : "none"
     }}>
       <div onClick={() => setPage("home")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 12 }}>
-        <img src="/gsartLOGO.png" alt="GSART" className="logo-glow" style={{ height: 44, width: 44, objectFit: "contain" }} />
+        <img src="/gsartLOGO.png" alt="GSART" className="logo-glow" style={{ height: 32, width: 32, objectFit: "contain" }} />
         <div>
           <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 300, letterSpacing: "0.3em", color: "var(--purple2)" }}>GSART</div>
           <div style={{ fontSize: 7, letterSpacing: "0.5em", textTransform: "uppercase", color: "var(--text2)", marginTop: -3 }}>Galería de Arte</div>
         </div>
       </div>
-      <div style={{ display: "flex", gap: 40, alignItems: "center" }}>
+      <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
         {[["Colección", "collection"], ["Artistas", "artists"], ["Boutique", "boutique"]].map(([label, pg]) => (
           <button key={pg} onClick={() => pg === "boutique" ? onBoutique() : setPage(pg)} style={{
             background: "none", border: "none", fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase",
