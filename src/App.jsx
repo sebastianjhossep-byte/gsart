@@ -218,7 +218,7 @@ const Hero = ({ setPage, onBoutique}) => (
       </div>
       <div style={{ fontSize: 9, letterSpacing: "0.6em", textTransform: "uppercase", color: "var(--purple)", marginBottom: 24 }}>Colecciones Exclusivas · Arte de Lujo</div>
       <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(56px, 10vw, 120px)", fontWeight: 300, lineHeight: 0.9, letterSpacing: "-0.02em", marginBottom: 40, color: "var(--white)" }}>
-        Arte que<br /><em className="purple-shimmer" style={{ fontStyle: "italic" }}>transciende</em>
+        Simplemente estilo de<br /><em className="purple-shimmer" style={{ fontStyle: "italic" }}>ARTE</em>
       </h1>
       <p style={{ maxWidth: 480, margin: "0 auto 48px", color: "var(--text2)", fontSize: 14, fontWeight: 300, lineHeight: 1.9, fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic" }}>
         Cuadros únicos de artistas emergentes. Cada obra es una conversación entre el artista y el coleccionista.
