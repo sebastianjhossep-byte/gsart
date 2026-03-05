@@ -96,12 +96,12 @@ const GlobalStyles = () => (
 
 const Btn = ({ children, variant = "purple", size = "md", onClick, style = {}, disabled }) => {
   const v = {
-    purple:  { background: "linear-gradient(135deg, #6b2fa0, #9b4fcc)", color: "#f0ecf8", border: "none" },
+    purple: { background: "linear-gradient(135deg, #6b2fa0, #9b4fcc)", color: "#f0ecf8", border: "none" },
     outline: { background: "transparent", color: "var(--purple2)", border: "1px solid var(--purple)" },
-    ghost:   { background: "transparent", color: "var(--text2)", border: "1px solid var(--border)" },
-    dark:    { background: "var(--dark2)", color: "var(--text)", border: "1px solid var(--border2)" },
-    danger:  { background: "transparent", color: "var(--red)", border: "1px solid rgba(192,57,43,0.4)" },
-    green:   { background: "transparent", color: "var(--green)", border: "1px solid rgba(39,174,96,0.4)" },
+    ghost: { background: "transparent", color: "var(--text2)", border: "1px solid var(--border)" },
+    dark: { background: "var(--dark2)", color: "var(--text)", border: "1px solid var(--border2)" },
+    danger: { background: "transparent", color: "var(--red)", border: "1px solid rgba(192,57,43,0.4)" },
+    green: { background: "transparent", color: "var(--green)", border: "1px solid rgba(39,174,96,0.4)" },
   };
   const s = {
     sm: { padding: "6px 14px", fontSize: 10, letterSpacing: "0.12em" },
@@ -199,7 +199,7 @@ const Navbar = ({ user, cartCount, onCart, onAuth, onLogout, onAdmin, onBoutique
 
         {/* Links desktop */}
         <div className="nav-links" style={{ display: "flex", gap: 32, alignItems: "center" }}>
-          {[["Colección", "collection"], ["Artistas", "artists"], ["Lanzamientos", "launches"],["Boutique", "boutique"]].map(([label, pg]) => (
+          {[["Colección", "collection"], ["Artistas", "artists"], ["Lanzamientos", "launches"], ["Boutique", "boutique"]].map(([label, pg]) => (
             <button key={pg} onClick={() => { pg === "boutique" ? onBoutique() : setPage(pg); setMenuOpen(false); }} style={{
               background: "none", border: "none", fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase",
               color: currentPage === pg ? "var(--purple2)" : "var(--text2)", cursor: "pointer", transition: "color 0.3s",
@@ -838,7 +838,7 @@ const LaunchesSection = ({ isAdmin }) => {
   const sendNotification = async () => {
     if (!email) return;
     // Guarda el email interesado en Supabase (tabla simple)
-    await supabase.from("launch_notifications").insert({ launch_id: notifLaunch.id, email }).catch(() => {});
+    await supabase.from("launch_notifications").insert({ launch_id: notifLaunch.id, email }).catch(() => { });
     setNotifSent(true);
   };
 
@@ -1060,7 +1060,10 @@ export default function App() {
       <GlobalStyles />
       <Navbar user={user} cartCount={cart.reduce((s, i) => s + i.qty, 0)} onCart={() => setShowCart(true)} onAuth={() => setShowAuth(true)} onLogout={handleLogout} onAdmin={() => setShowAdmin(true)} onBoutique={() => setShowBoutique(true)} currentPage={page} setPage={setPage} />
       <main>
-        {page === "home" && <Hero setPage={setPage} onBoutique={() => setShowBoutique(true)} />}
+        {page === "home" && <>
+          <Hero setPage={setPage} onBoutique={() => setShowBoutique(true)} />
+          <LaunchesSection isAdmin={true} />
+        </>}
         {page === "collection" && <CollectionPage products={products} onAddToCart={addToCart} onProductClick={setSelectedProduct} />}
         {page === "artists" && (
           <div style={{ padding: "120px 24px 80px", textAlign: "center" }}>
@@ -1070,7 +1073,7 @@ export default function App() {
           </div>
         )}
       </main>
-      
+
       <Footer setPage={setPage} />
       {showCart && <CartDrawer cart={cart} onClose={() => setShowCart(false)} onRemove={removeFromCart} onCheckout={() => { setShowCart(false); setShowCheckout(true); }} user={user} onAuth={() => { setShowCart(false); setShowAuth(true); }} />}
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} onAuth={setUser} />}
