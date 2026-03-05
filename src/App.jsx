@@ -807,7 +807,7 @@ const Countdown = ({ targetDate }) => {
 };
 
 // ── SECCIÓN LANZAMIENTOS ──────────────────────────────────────────────────────
-const LaunchesSection = ({ isAdmin }) => {
+const LaunchesSection = ({ true }) => {
   const [launches, setLaunches] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [email, setEmail] = useState("");
