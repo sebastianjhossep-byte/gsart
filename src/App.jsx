@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -199,7 +199,7 @@ const Navbar = ({ user, cartCount, onCart, onAuth, onLogout, onAdmin, onBoutique
 
         {/* Links desktop */}
         <div className="nav-links" style={{ display: "flex", gap: 32, alignItems: "center" }}>
-          {[["Colección", "collection"], ["Artistas", "artists"], ["Boutique", "boutique"]].map(([label, pg]) => (
+          {[["Colección", "collection"], ["Artistas", "artists"], ["Lanzamientos", "launches"],["Boutique", "boutique"]].map(([label, pg]) => (
             <button key={pg} onClick={() => { pg === "boutique" ? onBoutique() : setPage(pg); setMenuOpen(false); }} style={{
               background: "none", border: "none", fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase",
               color: currentPage === pg ? "var(--purple2)" : "var(--text2)", cursor: "pointer", transition: "color 0.3s",
@@ -236,7 +236,7 @@ const Navbar = ({ user, cartCount, onCart, onAuth, onLogout, onAdmin, onBoutique
       {menuOpen && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(6,6,8,0.98)", zIndex: 200, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 40 }}>
           <img src="/gsartLOGO.png" alt="GSART" className="logo-glow" style={{ height: 60, marginBottom: 16 }} />
-          {[["Colección", "collection"], ["Artistas", "artists"], ["Boutique", "boutique"]].map(([label, pg]) => (
+          {[["Colección", "collection"], ["Artistas", "artists"], ["Lanzamientos", "launches"], ["Boutique", "boutique"]].map(([label, pg]) => (
             <button key={pg} onClick={() => { pg === "boutique" ? onBoutique() : setPage(pg); setMenuOpen(false); }} style={{ ...navLinkStyle, fontSize: 16, color: "var(--text)" }}>
               {label}
             </button>
@@ -769,7 +769,209 @@ const AdminPanel = ({ onClose }) => {
     </div>
   );
 };
+// ── CUENTA ATRÁS ─────────────────────────────────────────────────────────────
+const Countdown = ({ targetDate }) => {
+  const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
+  useEffect(() => {
+    const calc = () => {
+      const diff = new Date(targetDate) - new Date();
+      if (diff <= 0) { setTime({ days: 0, hours: 0, minutes: 0, seconds: 0 }); return; }
+      setTime({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        minutes: Math.floor((diff % 3600000) / 60000),
+        seconds: Math.floor((diff % 60000) / 1000),
+      });
+    };
+    calc();
+    const interval = setInterval(calc, 1000);
+    return () => clearInterval(interval);
+  }, [targetDate]);
+
+  const pad = n => String(n).padStart(2, "0");
+  const isPast = new Date(targetDate) <= new Date();
+
+  if (isPast) return <div style={{ fontSize: 11, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--purple2)" }}>¡Ya disponible!</div>;
+
+  return (
+    <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+      {[["días", time.days], ["hrs", time.hours], ["min", time.minutes], ["seg", time.seconds]].map(([label, val]) => (
+        <div key={label} style={{ textAlign: "center" }}>
+          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 28, fontWeight: 300, color: "var(--purple2)", lineHeight: 1 }}>{pad(val)}</div>
+          <div style={{ fontSize: 7, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--text2)", marginTop: 4 }}>{label}</div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ── SECCIÓN LANZAMIENTOS ──────────────────────────────────────────────────────
+const LaunchesSection = ({ isAdmin }) => {
+  const [launches, setLaunches] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [email, setEmail] = useState("");
+  const [notifLaunch, setNotifLaunch] = useState(null);
+  const [notifSent, setNotifSent] = useState(false);
+  const [newLaunch, setNewLaunch] = useState({ title: "", description: "", launch_date: "", category: "" });
+
+  useEffect(() => {
+    supabase.from("launches").select("*").eq("active", true).order("launch_date", { ascending: true }).then(({ data }) => { if (data) setLaunches(data); });
+  }, []);
+
+  const createLaunch = async () => {
+    const { data } = await supabase.from("launches").insert({ ...newLaunch, active: true }).select().single();
+    if (data) {
+      setLaunches(prev => [...prev, data].sort((a, b) => new Date(a.launch_date) - new Date(b.launch_date)));
+      setShowForm(false);
+      setNewLaunch({ title: "", description: "", launch_date: "", category: "" });
+    }
+  };
+
+  const deleteLaunch = async (id) => {
+    await supabase.from("launches").update({ active: false }).eq("id", id);
+    setLaunches(prev => prev.filter(l => l.id !== id));
+  };
+
+  const handleNotify = (launch) => { setNotifLaunch(launch); setEmail(""); setNotifSent(false); };
+
+  const sendNotification = async () => {
+    if (!email) return;
+    // Guarda el email interesado en Supabase (tabla simple)
+    await supabase.from("launch_notifications").insert({ launch_id: notifLaunch.id, email }).catch(() => {});
+    setNotifSent(true);
+  };
+
+  return (
+    <section style={{ padding: "80px 48px", borderTop: "1px solid var(--border)", position: "relative" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        {/* Cabecera */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 60, flexWrap: "wrap", gap: 20 }}>
+          <div>
+            <div style={{ fontSize: 9, letterSpacing: "0.5em", textTransform: "uppercase", color: "var(--purple)", marginBottom: 16 }}>Próximas obras</div>
+            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(32px,6vw,52px)", fontWeight: 300, color: "var(--white)" }}>Lanzamientos</h2>
+          </div>
+          {isAdmin && (
+            <Btn onClick={() => setShowForm(!showForm)}>+ Añadir lanzamiento</Btn>
+          )}
+        </div>
+
+        {/* Formulario admin */}
+        {isAdmin && showForm && (
+          <div style={{ background: "var(--dark)", border: "1px solid var(--border2)", padding: 32, marginBottom: 48 }} className="slide-up">
+            <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, marginBottom: 24 }}>Nuevo lanzamiento</h4>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 20, marginBottom: 20 }}>
+              <Input label="Título" value={newLaunch.title} onChange={e => setNewLaunch(p => ({ ...p, title: e.target.value }))} placeholder="Nombre de la obra" />
+              <Input label="Categoría" value={newLaunch.category} onChange={e => setNewLaunch(p => ({ ...p, category: e.target.value }))} placeholder="Óleo, Acrílico..." />
+              <Input label="Fecha de lanzamiento" type="datetime-local" value={newLaunch.launch_date} onChange={e => setNewLaunch(p => ({ ...p, launch_date: e.target.value }))} />
+            </div>
+            <div style={{ marginBottom: 24 }}>
+              <Input label="Descripción" value={newLaunch.description} onChange={e => setNewLaunch(p => ({ ...p, description: e.target.value }))} placeholder="Descripción de la obra..." />
+            </div>
+            <div style={{ display: "flex", gap: 12 }}>
+              <Btn onClick={createLaunch} disabled={!newLaunch.title || !newLaunch.launch_date}>Publicar lanzamiento</Btn>
+              <Btn variant="ghost" onClick={() => setShowForm(false)}>Cancelar</Btn>
+            </div>
+          </div>
+        )}
+
+        {/* Lista de lanzamientos */}
+        {launches.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "60px 0" }}>
+            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontStyle: "italic", color: "var(--text2)" }}>
+              Próximamente nuevas obras...
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {launches.map((launch, i) => {
+              const isPast = new Date(launch.launch_date) <= new Date();
+              return (
+                <div key={launch.id} className="fade-in" style={{
+                  display: "grid", gridTemplateColumns: "auto 1fr auto", gap: 32, alignItems: "center",
+                  padding: "32px 24px", background: i % 2 === 0 ? "var(--dark)" : "transparent",
+                  border: "1px solid var(--border)", transition: "border-color 0.3s"
+                }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = "var(--border2)"}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
+                >
+                  {/* Número */}
+                  <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 48, fontWeight: 300, color: "rgba(155,79,204,0.2)", lineHeight: 1, minWidth: 48, textAlign: "center" }}>
+                    {String(i + 1).padStart(2, "0")}
+                  </div>
+
+                  {/* Info */}
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8, flexWrap: "wrap" }}>
+                      {launch.category && (
+                        <span style={{ fontSize: 8, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--purple)", border: "1px solid var(--border2)", padding: "2px 8px" }}>{launch.category}</span>
+                      )}
+                      {isPast && (
+                        <span style={{ fontSize: 8, letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--green)", border: "1px solid rgba(39,174,96,0.3)", padding: "2px 8px" }}>Disponible</span>
+                      )}
+                    </div>
+                    <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 24, fontWeight: 400, color: "var(--white)", marginBottom: 8 }}>{launch.title}</div>
+                    {launch.description && (
+                      <div style={{ fontSize: 12, color: "var(--text2)", lineHeight: 1.7, marginBottom: 12, maxWidth: 500 }}>{launch.description}</div>
+                    )}
+                    <div style={{ fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text2)" }}>
+                      {new Date(launch.launch_date).toLocaleDateString("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </div>
+                  </div>
+
+                  {/* Cuenta atrás + acciones */}
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 16, minWidth: 160 }}>
+                    <Countdown targetDate={launch.launch_date} />
+                    {!isPast && (
+                      <button onClick={() => handleNotify(launch)} style={{
+                        background: "transparent", border: "1px solid var(--border2)", color: "var(--text2)",
+                        fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase", padding: "6px 14px", cursor: "pointer", transition: "all 0.3s"
+                      }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--purple)"; e.currentTarget.style.color = "var(--purple2)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border2)"; e.currentTarget.style.color = "var(--text2)"; }}
+                      >Notificarme</button>
+                    )}
+                    {isAdmin && (
+                      <button onClick={() => deleteLaunch(launch.id)} style={{ background: "none", border: "none", color: "var(--red)", fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", opacity: 0.6 }}>Eliminar</button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Modal notificación */}
+      {notifLaunch && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(6,6,8,0.95)", zIndex: 900, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+          onClick={e => e.target === e.currentTarget && setNotifLaunch(null)}>
+          <div className="slide-up" style={{ background: "var(--dark)", border: "1px solid var(--border2)", width: "100%", maxWidth: 420, padding: 48, position: "relative", textAlign: "center" }}>
+            <button onClick={() => setNotifLaunch(null)} style={{ position: "absolute", top: 16, right: 20, background: "none", border: "none", color: "var(--text2)", fontSize: 24, cursor: "pointer" }}>×</button>
+            <img src="/gsartLOGO.png" alt="GSART" className="logo-glow" style={{ height: 48, marginBottom: 20 }} />
+            <div style={{ fontSize: 9, letterSpacing: "0.4em", textTransform: "uppercase", color: "var(--purple)", marginBottom: 12 }}>Avísame</div>
+            <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 300, marginBottom: 8 }}>{notifLaunch.title}</h3>
+            <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic", color: "var(--text2)", fontSize: 14, marginBottom: 32 }}>
+              Te avisaremos cuando esta obra esté disponible.
+            </p>
+            {!notifSent ? (
+              <>
+                <Input label="Tu email" type="email" placeholder="tu@email.com" value={email} onChange={e => setEmail(e.target.value)} style={{ marginBottom: 24, textAlign: "left" }} />
+                <Btn size="lg" onClick={sendNotification} disabled={!email}>Notificarme</Btn>
+              </>
+            ) : (
+              <div>
+                <div style={{ fontSize: 32, marginBottom: 16 }}>✓</div>
+                <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 20, color: "var(--purple2)", marginBottom: 8 }}>¡Anotado!</div>
+                <div style={{ fontSize: 12, color: "var(--text2)" }}>Te avisaremos en {email}</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+};
 const Footer = ({ setPage }) => (
   <footer className="footer-grid" style={{ borderTop: "1px solid var(--border)", padding: "60px 48px", display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 40 }}>
     <div>
@@ -868,6 +1070,7 @@ export default function App() {
           </div>
         )}
       </main>
+      
       <Footer setPage={setPage} />
       {showCart && <CartDrawer cart={cart} onClose={() => setShowCart(false)} onRemove={removeFromCart} onCheckout={() => { setShowCart(false); setShowCheckout(true); }} user={user} onAuth={() => { setShowCart(false); setShowAuth(true); }} />}
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} onAuth={setUser} />}
