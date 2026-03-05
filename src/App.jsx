@@ -662,7 +662,7 @@ const AdminPanel = ({ onClose }) => {
         </div>
 
         <div style={{ display: "flex", borderBottom: "1px solid var(--border)", marginBottom: 32, overflowX: "auto" }}>
-          {[["products", "Productos"], ["orders", "Pedidos"], ["codes", "Códigos Boutique"]].map(([t, l]) => (
+          {[["products", "Productos"], ["orders", "Pedidos"], ["codes", "Códigos Boutique"], ["launches", "Lanzamientos"]].map(([t, l]) => (
             <button key={t} onClick={() => setTab(t)} style={{ padding: "12px 20px", background: "none", border: "none", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", color: tab === t ? "var(--purple2)" : "var(--text2)", borderBottom: tab === t ? "1px solid var(--purple)" : "none", marginBottom: -1, transition: "color 0.3s" }}>{l}</button>
           ))}
         </div>
@@ -765,8 +765,41 @@ const AdminPanel = ({ onClose }) => {
             </div>
           </div>
         )}
+        {tab === "launches" && (
+  <div>
+    <div style={{ background: "var(--dark)", border: "1px solid var(--border2)", padding: "24px 20px", marginBottom: 28 }}>
+      <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, marginBottom: 20 }}>Nuevo lanzamiento</h4>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16, marginBottom: 16 }}>
+        <Input label="Título" value={newLaunch.title} onChange={e => setNewLaunch(p => ({ ...p, title: e.target.value }))} placeholder="Nombre de la obra" />
+        <Input label="Categoría" value={newLaunch.category} onChange={e => setNewLaunch(p => ({ ...p, category: e.target.value }))} placeholder="Óleo, Acrílico..." />
+        <Input label="Fecha de lanzamiento" type="datetime-local" value={newLaunch.launch_date} onChange={e => setNewLaunch(p => ({ ...p, launch_date: e.target.value }))} />
+      </div>
+      <div style={{ marginBottom: 16 }}>
+        <Input label="Descripción" value={newLaunch.description} onChange={e => setNewLaunch(p => ({ ...p, description: e.target.value }))} placeholder="Descripción de la obra..." />
+      </div>
+      <Btn onClick={createLaunch} disabled={!newLaunch.title || !newLaunch.launch_date}>Publicar lanzamiento</Btn>
+    </div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      {launches.map((launch, i) => (
+        <div key={launch.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", background: "var(--dark)", border: "1px solid var(--border)", flexWrap: "wrap", gap: 8 }}>
+          <div>
+            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 17 }}>{launch.title}</div>
+            <div style={{ fontSize: 9, color: "var(--text2)", letterSpacing: "0.15em", textTransform: "uppercase", marginTop: 2 }}>
+              {launch.category} · {new Date(launch.launch_date).toLocaleDateString("es-ES")}
+            </div>
+          </div>
+          <button onClick={() => deleteLaunch(launch.id)} style={{ background: "none", border: "1px solid rgba(192,57,43,0.4)", color: "var(--red)", fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", padding: "3px 8px", cursor: "pointer" }}>
+            Eliminar
+          </button>
+        </div>
+      ))}
+      {launches.length === 0 && <div style={{ textAlign: "center", padding: "40px 0", color: "var(--text2)", fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic" }}>No hay lanzamientos aún</div>}
+    </div>
+  </div>
+)}
       </div>
     </div>
+    
   );
 };
 // ── CUENTA ATRÁS ─────────────────────────────────────────────────────────────
